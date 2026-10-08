@@ -1,3 +1,4 @@
+# Terraform Configuration for Dev Environment
 locals {
   project = "pharma"
   env     = "dev"
