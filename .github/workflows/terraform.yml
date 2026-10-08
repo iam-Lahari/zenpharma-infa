@@ -75,7 +75,7 @@ jobs:
       - name: Release state lock on failure
         if: failure() || cancelled()
         run: |
-          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/terraform.tfstate.lock.info || true
+          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/.terraform.tfstate.lock.info || true
 
       - name: Upload plan file
         if: steps.plan.outcome == 'success'
