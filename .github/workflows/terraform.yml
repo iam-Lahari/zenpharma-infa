@@ -75,7 +75,7 @@ jobs:
       - name: Release state lock on failure
         if: failure() || cancelled()
         run: |
-          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/terraform.tfstate.tflock || true
+          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/terraform.tfstate.lock.info || true
 
       - name: Upload plan file
         if: steps.plan.outcome == 'success'
@@ -87,7 +87,13 @@ jobs:
 
       - name: Terraform Apply
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply' }}
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply \
+            -var="db_password=${{ secrets.DEV_DB_PASSWORD }}" \
+            -var="jwt_secret=${{ secrets.DEV_JWT_SECRET }}" \
+            -var="github_org=${{ vars.GH_ORG }}" \
+            -auto-approve \
+            -no-color
 
       - name: Terraform Destroy
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy' && github.event.inputs.confirm_destroy == 'destroy' }}
@@ -103,7 +109,7 @@ jobs:
       - name: Release state lock on failure
         if: failure() || cancelled()
         run: |
-          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/terraform.tfstate.tflock || true
+          aws s3 rm s3://${{ vars.TF_STATE_BUCKET }}/envs/dev/.terraform.tfstate.lock.info || true
 
 
 
